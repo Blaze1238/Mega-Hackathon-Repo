@@ -6,7 +6,7 @@ function App() {
   return (
     <Router>
       <div>
-        <header>
+        <header style={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: '#fff' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid #ccc' }}>
             <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Border Bridge</div>
             <nav style={{ display: 'flex', gap: '0.5rem' }}>

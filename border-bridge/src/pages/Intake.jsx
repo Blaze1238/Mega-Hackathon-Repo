@@ -143,42 +143,45 @@ function Intake() {
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Progress Indicator */}
-        <div className="mb-8">
+        <div className="mt-5">
           <div className="flex items-center justify-between mb-4">
             {steps.map((step, index) => {
               const Icon = step.icon;
+              const isCompleted = index < currentStep;
+              const isCurrent = index === currentStep;
+
               return (
                 <div key={index} className="flex items-center">
                   <div
                     className={`flex items-center justify-center w-12 h-12 rounded-full ${
-                      index <= currentStep
-                        ? 'bg-brand-primary text-white'
-                        : 'bg-gray-200 text-gray-400'
+                      isCompleted
+                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-200'
+                        : isCurrent
+                          ? 'bg-amber-200 text-slate-900 ring-2 ring-amber-400'
+                          : 'bg-gray-200 text-gray-400'
                     }`}
                   >
                     <Icon className="w-6 h-6" />
                   </div>
                   {index < steps.length - 1 && (
-                    <div
-                      className={`w-16 h-1 mx-2 ${
-                        index < currentStep ? 'bg-brand-primary' : 'bg-gray-200'
-                      }`}
-                    />
+                    <div className="w-20 h-1 mx-1 rounded-full bg-gray-300" />
                   )}
                 </div>
               );
             })}
           </div>
+        </div>
+
+        <div className="mt-10">
           <h1 className="text-3xl font-bold text-gray-900 text-center">
             {steps[currentStep].title}
           </h1>
           <p className="text-gray-600 text-center mt-2">
             {steps[currentStep].description}
           </p>
-        </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white rounded-lg shadow-lg p-8">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white rounded-lg shadow-lg p-8 mt-6">
             {/* Step 1: Core Identity */}
             {currentStep === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -343,7 +346,7 @@ function Intake() {
                 <div>
                   <FormLabel>Family Members Present</FormLabel>
                   {familyFields.map((field, index) => (
-                    <div key={field.id} className="flex items-center space-x-2 mt-2">
+                    <div key={field.id} className="flex items-center gap-3 mt-2">
                       <Input
                         {...form.register(`familyMembers.${index}.value`)}
                         placeholder="Family member name"
@@ -362,7 +365,7 @@ function Intake() {
                     type="button"
                     variant="outline"
                     onClick={() => appendFamily({ value: '' })}
-                    className="mt-2"
+                    className="mt-2 ml-2"
                   >
                     Add Family Member
                   </Button>
@@ -371,7 +374,7 @@ function Intake() {
                 <div>
                   <FormLabel>Missing Relatives</FormLabel>
                   {missingFields.map((field, index) => (
-                    <div key={field.id} className="flex items-center space-x-2 mt-2">
+                    <div key={field.id} className="flex items-center gap-3 mt-2">
                       <Input
                         {...form.register(`missingRelatives.${index}.value`)}
                         placeholder="Missing relative name"
@@ -390,7 +393,7 @@ function Intake() {
                     type="button"
                     variant="outline"
                     onClick={() => appendMissing({ value: '' })}
-                    className="mt-2"
+                    className="mt-2 ml-2"
                   >
                     Add Missing Relative
                   </Button>
@@ -485,7 +488,7 @@ function Intake() {
                 Previous
               </Button>
               {currentStep < steps.length - 1 ? (
-                <Button type="button" onClick={nextStep}>
+                <Button type="button" variant="outline" onClick={nextStep}>
                   Next
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -493,8 +496,9 @@ function Intake() {
                 <Button type="submit">Submit Intake</Button>
               )}
             </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   );
