@@ -18,7 +18,7 @@ function App() {
               </Link>
               <Link
                 to="/intake"
-                style={{ padding: '0.5rem 0.75rem', textDecoration: 'none', backgroundColor: '#333', color: 'white' }}
+                style={{ padding: '0.5rem 0.75rem', textDecoration: 'none', color: '#333' }}
               >
                 Intake
               </Link>
