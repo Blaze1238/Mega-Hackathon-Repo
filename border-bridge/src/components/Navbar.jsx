@@ -36,6 +36,12 @@ export function Navbar() {
           >
             Intake
           </Link>
+          <Link
+            to="/case/CS-2024-8932A"
+            className="px-3 py-2 rounded-md text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors"
+          >
+            Case File (Demo)
+          </Link>
           <button
             onClick={handleLogout}
             className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors"

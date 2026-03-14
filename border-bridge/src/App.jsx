@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Intake from './pages/Intake';
 import Submitted from './pages/Submitted';
 import Login from './pages/Login';
+import CaseFile from './pages/CaseFile';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
@@ -34,6 +35,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/intake" element={<Intake />} />
                 <Route path="/submitted" element={<Submitted />} />
+                <Route path="/case/:id" element={<CaseFile />} />
               </Route>
 
               {/* Catch-all */}
