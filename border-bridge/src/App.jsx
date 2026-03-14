@@ -1,12 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Intake from './pages/Intake';
+import Submitted from './pages/Submitted';
 
 function App() {
   return (
     <Router>
       <div>
-        <header style={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: '#fff' }}>
+        <header>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid #ccc' }}>
             <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Border Bridge</div>
             <nav style={{ display: 'flex', gap: '0.5rem' }}>
@@ -40,6 +41,7 @@ function App() {
               }
             />
             <Route path="/intake" element={<Intake />} />
+            <Route path="/submitted" element={<Submitted />} />
           </Routes>
         </main>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { intakeFormSchema } from '../types/formSchema';
@@ -21,16 +22,14 @@ import {
   FormLabel,
   FormMessage,
 } from '../components/ui/form';
-import { Skeleton } from '../components/ui/skeleton';
 import {
   ChevronLeft,
   ChevronRight,
+  CheckCircle2,
   Mic,
   Users,
   Heart,
   Shield,
-  CheckCircle,
-  QrCode,
 } from 'lucide-react';
 
 const steps = [
@@ -42,8 +41,51 @@ const steps = [
 
 function Intake() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const navigate = useNavigate();
+
+  const requiredFieldsByStep = {
+    0: ['fullName', 'nationality'],
+  };
+
+  const renderFieldLabel = (label, isRequired = false) => (
+    <>
+      {label}
+      {isRequired && <span className="text-amber-600 font-semibold"> *</span>}
+    </>
+  );
+
+  const isValuePresent = (value) => {
+    if (typeof value === 'string') {
+      return value.trim().length > 0;
+    }
+
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'number') {
+      return !Number.isNaN(value);
+    }
+
+    if (value && typeof value === 'object') {
+      if (typeof value.value === 'string') {
+        return value.value.trim().length > 0;
+      }
+      return Object.keys(value).length > 0;
+    }
+
+    return value != null;
+  };
+
+  const getFieldValue = (values, fieldPath) => {
+    return fieldPath
+      .split('.')
+      .reduce((acc, key) => (acc == null ? undefined : acc[key]), values);
+  };
 
   const form = useForm({
     resolver: zodResolver(intakeFormSchema),
@@ -74,23 +116,43 @@ function Intake() {
     name: 'missingRelatives',
   });
 
+  const currentStepRequiredFields = requiredFieldsByStep[currentStep] || [];
+  const watchedFormValues = form.watch();
+  const isCurrentStepReady =
+    currentStepRequiredFields.length === 0
+      || currentStepRequiredFields.every((fieldName) => {
+        const fieldValue = getFieldValue(watchedFormValues, fieldName);
+        return isValuePresent(fieldValue);
+      });
+
   function onSubmit(values) {
-    // Map object arrays back to plain string arrays for submission
+    // Map object arrays back to plain string arrays before persisting.
     const payload = {
       ...values,
       familyMembers: values.familyMembers.map((m) => m.value),
       missingRelatives: values.missingRelatives.map((r) => r.value),
+      submittedAt: new Date().toISOString(),
     };
-    console.log(payload);
-    setIsProcessing(true);
-    // Simulate AI processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsSuccess(true);
-    }, 3000);
+
+    const storageKey = 'borderBridgeIntakeSubmissions';
+    const existingRaw = localStorage.getItem(storageKey);
+    const existingSubmissions = existingRaw ? JSON.parse(existingRaw) : [];
+    const nextSubmissions = [...existingSubmissions, payload];
+
+    localStorage.setItem(storageKey, JSON.stringify(nextSubmissions));
+    navigate('/submitted');
   }
 
-  const nextStep = () => {
+  const nextStep = async () => {
+    const requiredFields = requiredFieldsByStep[currentStep] || [];
+
+    if (requiredFields.length > 0) {
+      const stepIsValid = await form.trigger(requiredFields);
+      if (!stepIsValid) {
+        return;
+      }
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -102,42 +164,15 @@ function Intake() {
     }
   };
 
-  if (isProcessing) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8">
-          <div className="text-center mb-8">
-            <div className="animate-pulse text-4xl mb-4">🤖</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Processing Intake</h2>
-            <p className="text-gray-600">AI is analyzing the information...</p>
-          </div>
-          <div className="space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-32 w-full" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
 
-  if (isSuccess) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Intake Complete</h2>
-          <p className="text-gray-600 mb-8">Your information has been processed successfully.</p>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8">
-            <QrCode className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-500">QR Card Component Placeholder</p>
-            <p className="text-sm text-gray-400 mt-2">This will display the generated QR code</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    if (currentStep !== steps.length - 1) {
+      return;
+    }
+
+    void form.handleSubmit(onSubmit)(event);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -180,8 +215,10 @@ function Intake() {
             {steps[currentStep].description}
           </p>
 
+
+
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white rounded-lg shadow-lg p-8 mt-6">
+            <form onSubmit={handleFormSubmit} className="bg-white rounded-lg shadow-lg p-8 mt-6">
             {/* Step 1: Core Identity */}
             {currentStep === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -190,7 +227,7 @@ function Intake() {
                   name="fullName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name *</FormLabel>
+                      <FormLabel>{renderFieldLabel('Full Name', true)}</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter full name" {...field} />
                       </FormControl>
@@ -203,7 +240,7 @@ function Intake() {
                   name="nativeScriptNames"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Native Script Names</FormLabel>
+                      <FormLabel>{renderFieldLabel('Native Script Names')}</FormLabel>
                       <FormControl>
                         <Input placeholder="Original language spelling" {...field} />
                       </FormControl>
@@ -216,7 +253,7 @@ function Intake() {
                   name="dateOfBirth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date of Birth / Estimated Age</FormLabel>
+                      <FormLabel>{renderFieldLabel('Date of Birth / Estimated Age')}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
@@ -229,7 +266,7 @@ function Intake() {
                   name="gender"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Gender</FormLabel>
+                      <FormLabel>{renderFieldLabel('Gender')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -252,7 +289,7 @@ function Intake() {
                   name="nationality"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nationality *</FormLabel>
+                      <FormLabel>{renderFieldLabel('Nationality', true)}</FormLabel>
                       <FormControl>
                         <Input placeholder="Country of origin" {...field} />
                       </FormControl>
@@ -265,7 +302,7 @@ function Intake() {
                   name="preferredLanguage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Preferred Language</FormLabel>
+                      <FormLabel>{renderFieldLabel('Preferred Language')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -295,7 +332,7 @@ function Intake() {
                   name="voiceNarrative"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Voice Narrative</FormLabel>
+                      <FormLabel>{renderFieldLabel('Voice Narrative')}</FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Your story will appear here after voice recording..."
@@ -334,7 +371,7 @@ function Intake() {
                         />
                       </FormControl>
                       <div className="space-y-1 leading-none">
-                        <FormLabel>Traveling Alone</FormLabel>
+                        <FormLabel>{renderFieldLabel('Traveling Alone')}</FormLabel>
                         <p className="text-sm text-gray-500">
                           Check if you are not traveling with family members
                         </p>
@@ -344,7 +381,7 @@ function Intake() {
                 />
 
                 <div>
-                  <FormLabel>Family Members Present</FormLabel>
+                  <FormLabel>{renderFieldLabel('Family Members Present')}</FormLabel>
                   {familyFields.map((field, index) => (
                     <div key={field.id} className="flex items-center gap-3 mt-2">
                       <Input
@@ -372,7 +409,7 @@ function Intake() {
                 </div>
 
                 <div>
-                  <FormLabel>Missing Relatives</FormLabel>
+                  <FormLabel>{renderFieldLabel('Missing Relatives')}</FormLabel>
                   {missingFields.map((field, index) => (
                     <div key={field.id} className="flex items-center gap-3 mt-2">
                       <Input
@@ -410,7 +447,7 @@ function Intake() {
                   render={() => (
                     <FormItem>
                       <div className="mb-4">
-                        <FormLabel className="text-base">Urgent Needs</FormLabel>
+                        <FormLabel className="text-base">{renderFieldLabel('Urgent Needs')}</FormLabel>
                         <p className="text-sm text-gray-500">Select all that apply</p>
                       </div>
                       {['Medical', 'Food', 'Shelter', 'Legal', 'Protection'].map((item) => (
@@ -456,7 +493,7 @@ function Intake() {
                   name="vulnerabilityMarker"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Vulnerability Marker</FormLabel>
+                      <FormLabel>{renderFieldLabel('Vulnerability Marker')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -488,12 +525,26 @@ function Intake() {
                 Previous
               </Button>
               {currentStep < steps.length - 1 ? (
-                <Button type="button" variant="outline" onClick={nextStep}>
+                <Button
+                  key="next-btn"
+                  type="button"
+                  variant="outline"
+                  onClick={nextStep}
+                  disabled={!isCurrentStepReady}
+                  className="disabled:opacity-45 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200"
+                >
                   Next
                   <ChevronRight className="w-4 h-4 ml-2" />
                 </Button>
               ) : (
-                <Button type="submit">Submit Intake</Button>
+                <Button
+                  key="submit-btn"
+                  type="submit"
+                  className="bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-500 px-6 font-semibold shadow-sm"
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                  Submit Intake Form
+                </Button>
               )}
             </div>
             </form>
