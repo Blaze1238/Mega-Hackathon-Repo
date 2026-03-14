@@ -8,16 +8,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 
-function Home() {
-  return (
-    <div className="max-w-4xl mx-auto border-2 border-dashed border-gray-300 rounded-lg p-12 mt-8 text-center bg-white shadow-sm">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">Welcome to Border Bridge</h1>
-      <p className="text-gray-600 text-lg">
-        Use the navigation to get started. The Intake form is under the "Intake" page.
-      </p>
-    </div>
-  );
-}
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
@@ -32,7 +23,7 @@ function App() {
 
               {/* Protected Routes */}
               <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Dashboard />} />
                 <Route path="/intake" element={<Intake />} />
                 <Route path="/submitted" element={<Submitted />} />
                 <Route path="/case/:id" element={<CaseFile />} />
