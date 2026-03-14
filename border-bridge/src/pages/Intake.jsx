@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { intakeFormSchema } from '../types/formSchema';
+import AudioRecorder from '../components/AudioRecorder';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -44,7 +45,7 @@ function Intake() {
   const navigate = useNavigate();
 
   const requiredFieldsByStep = {
-    0: ['fullName', 'nationality'],
+    0: ['fullName', 'nationality', 'preferredLanguage'],
   };
 
   const renderFieldLabel = (label, isRequired = false) => (
@@ -95,7 +96,7 @@ function Intake() {
       dateOfBirth: '',
       gender: 'Prefer not to say',
       nationality: '',
-      preferredLanguage: 'English',
+      preferredLanguage: '',
       voiceNarrative: '',
       isTravelingAlone: false,
       familyMembers: [],
@@ -301,8 +302,8 @@ function Intake() {
                     name="preferredLanguage"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{renderFieldLabel('Preferred Language')}</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormLabel>{renderFieldLabel('Preferred Language', true)}</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select language" />
@@ -310,9 +311,15 @@ function Intake() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="English">English</SelectItem>
+                            <SelectItem value="Spanish">Spanish</SelectItem>
                             <SelectItem value="Arabic">Arabic</SelectItem>
                             <SelectItem value="French">French</SelectItem>
-                            <SelectItem value="Spanish">Spanish</SelectItem>
+                            <SelectItem value="Swahili">Swahili</SelectItem>
+                            <SelectItem value="Ukrainian">Ukrainian</SelectItem>
+                            <SelectItem value="Russian">Russian</SelectItem>
+                            <SelectItem value="Pashto">Pashto</SelectItem>
+                            <SelectItem value="Dari">Dari</SelectItem>
+                            <SelectItem value="Farsi">Farsi</SelectItem>
                             <SelectItem value="Other">Other</SelectItem>
                           </SelectContent>
                         </Select>
@@ -331,27 +338,20 @@ function Intake() {
                     name="voiceNarrative"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{renderFieldLabel('Voice Narrative')}</FormLabel>
+                        <FormLabel>{renderFieldLabel('Refugee Narrative (Speech-to-Text)')}</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="Your story will appear here after voice recording..."
-                            className="min-h-[200px] text-lg"
-                            {...field}
+                          <AudioRecorder 
+                            preferredLanguage={form.watch('preferredLanguage') || 'English'}
+                            initialValue={field.value}
+                            onTranscriptionUpdate={(text) => {
+                              field.onChange(text);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <div className="text-center">
-                    <Button type="button" size="lg" className="px-8 py-4 text-lg">
-                      <Mic className="w-6 h-6 mr-2" />
-                      Start Recording
-                    </Button>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Click to begin voice recording (placeholder)
-                    </p>
-                  </div>
                 </div>
               )}
 

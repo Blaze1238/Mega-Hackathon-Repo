@@ -12,7 +12,7 @@ export const intakeFormSchema = z.object({
   dateOfBirth: z.string().optional(), // Date or estimated age for age verification
   gender: z.enum(['Male', 'Female', 'Non-binary', 'Prefer not to say']), // Gender selection for demographic tracking
   nationality: z.string().min(1, 'Nationality is required'), // Country of origin for refugee status
-  preferredLanguage: z.enum(['English', 'Arabic', 'French', 'Spanish', 'Other']), // Language preference for communication (i18n ready)
+  preferredLanguage: z.string().min(1, 'Preferred Language is required'), // Language preference for communication (i18n ready)
 
   // Section 2: The Narrative (AI Input)
   // Voice-recorded story for AI processing
