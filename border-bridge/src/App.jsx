@@ -1,61 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Intake from './pages/Intake';
+import Submitted from './pages/Submitted';
 import Login from './pages/Login';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Navbar from './components/Navbar';
 
-function Navbar() {
-  const { isAuthenticated, logout } = useAuth();
-  const location = useLocation();
-
-  // Hide Navbar completely on the login page
-  if (location.pathname === '/login') {
-    return null;
-  }
-
+function Home() {
   return (
-    <header>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid #ccc' }}>
-        <div style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>Border Bridge</div>
-        <nav style={{ display: 'flex', gap: '0.5rem' }}>
-          <Link
-            to="/home"
-            style={{ padding: '0.5rem 0.75rem', textDecoration: 'none', color: '#333' }}
-          >
-            Home
-          </Link>
-          <Link
-            to="/intake"
-            style={{ padding: '0.5rem 0.75rem', textDecoration: 'none', color: '#333' }}
-          >
-            Intake
-          </Link>
-          {isAuthenticated ? (
-            <button
-              onClick={logout}
-              style={{
-                padding: '0.5rem 0.75rem',
-                border: 'none',
-                background: 'none',
-                color: '#333',
-                cursor: 'pointer',
-                fontSize: '1rem',
-              }}
-            >
-              Logout
-            </button>
-          ) : (
-            <Link
-              to="/login"
-              style={{ padding: '0.5rem 0.75rem', textDecoration: 'none', color: '#333' }}
-            >
-              Login
-            </Link>
-          )}
-        </nav>
-      </div>
-    </header>
+    <div className="max-w-4xl mx-auto border-2 border-dashed border-gray-300 rounded-lg p-12 mt-8 text-center bg-white shadow-sm">
+      <h1 className="text-3xl font-bold text-gray-900 mb-4">Welcome to Border Bridge</h1>
+      <p className="text-gray-600 text-lg">
+        Use the navigation to get started. The Intake form is under the "Intake" page.
+      </p>
+    </div>
   );
 }
 
@@ -63,29 +22,22 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div>
+        <div className="min-h-screen bg-gray-50 flex flex-col">
           <Navbar />
-          <main style={{ padding: '2rem' }}>
+          <main className="flex-1 p-4 md:p-8">
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
-              <Route path="/" element={<Login />} />
 
               {/* Protected Routes */}
               <Route element={<ProtectedRoute />}>
-                <Route
-                  path="/home"
-                  element={
-                    <div style={{ border: '2px dashed #ccc', padding: '2rem', textAlign: 'center' }}>
-                      <h1>Welcome to Border Bridge</h1>
-                      <p style={{ marginTop: '1rem' }}>
-                        Use the navigation to get started. The Intake form is under the "Intake" page.
-                      </p>
-                    </div>
-                  }
-                />
+                <Route path="/" element={<Home />} />
                 <Route path="/intake" element={<Intake />} />
+                <Route path="/submitted" element={<Submitted />} />
               </Route>
+
+              {/* Catch-all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
         </div>

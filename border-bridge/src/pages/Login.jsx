@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,8 +23,18 @@ const loginSchema = z.object({
 
 function Login() {
   const [isProcessing, setIsProcessing] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || '/';
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -41,7 +51,7 @@ function Login() {
       // Create a dummy user session
       login({ email: values.email, name: values.email.split('@')[0] });
       setIsProcessing(false);
-      navigate('/home');
+      navigate(from, { replace: true });
     }, 1500);
   }
 

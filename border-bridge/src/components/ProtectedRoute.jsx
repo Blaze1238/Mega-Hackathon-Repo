@@ -1,15 +1,16 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function ProtectedRoute() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  return <Outlet />;
 }
 
 export default ProtectedRoute;
