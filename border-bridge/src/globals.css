@@ -1,7 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
+@theme inline {
+  --color-brand-primary: hsl(var(--brand-primary));
+  --color-brand-secondary: hsl(var(--brand-secondary));
+  --color-brand-accent: hsl(var(--brand-accent));
+}
 @layer base {
   :root {
     /* shadcn/ui required CSS variables */
