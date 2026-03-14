@@ -12,6 +12,7 @@ const languageCodeMap = {
   'Swahili': 'sw-KE',
   'Ukrainian': 'uk-UA',
   'Russian': 'ru-RU',
+  'Hindi': 'hi-IN',
   'Pashto': 'ps-AF',
   'Dari': 'prs-AF', // Simplified
   'Farsi': 'fa-IR',
@@ -27,6 +28,7 @@ const libreTranslateCodeMap = {
   'Swahili': 'sw',
   'Ukrainian': 'uk',
   'Russian': 'ru',
+  'Hindi': 'hi',
   'Pashto': 'ps', // Not supported by default LibreTranslate models typically, but we will send it.
   'Dari': 'fa', // Map to Persian as LibreTranslate fallback
   'Farsi': 'fa',

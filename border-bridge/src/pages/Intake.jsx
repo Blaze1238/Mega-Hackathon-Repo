@@ -317,6 +317,7 @@ function Intake() {
                             <SelectItem value="Swahili">Swahili</SelectItem>
                             <SelectItem value="Ukrainian">Ukrainian</SelectItem>
                             <SelectItem value="Russian">Russian</SelectItem>
+                            <SelectItem value="Hindi">Hindi</SelectItem>
                             <SelectItem value="Pashto">Pashto</SelectItem>
                             <SelectItem value="Dari">Dari</SelectItem>
                             <SelectItem value="Farsi">Farsi</SelectItem>
