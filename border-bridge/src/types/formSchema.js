@@ -17,6 +17,7 @@ export const intakeFormSchema = z.object({
   // Section 2: The Narrative (AI Input)
   // Voice-recorded story for AI processing
   voiceNarrative: z.string().optional(), // Large text area for speech-to-text transcription
+  translatedNarrative: z.string().optional(), // The English translation of the story
 
   // Section 3: Family & Relationships (The Matching Logic)
   // Information for family reunification and matching

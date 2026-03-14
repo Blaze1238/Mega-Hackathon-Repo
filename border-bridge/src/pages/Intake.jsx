@@ -98,6 +98,7 @@ function Intake() {
       nationality: '',
       preferredLanguage: '',
       voiceNarrative: '',
+      translatedNarrative: '',
       isTravelingAlone: false,
       familyMembers: [],
       missingRelatives: [],
@@ -190,10 +191,10 @@ function Intake() {
                 <div key={index} className="flex items-center">
                   <div
                     className={`flex items-center justify-center w-12 h-12 rounded-full ${isCompleted
-                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-200'
-                        : isCurrent
-                          ? 'bg-amber-200 text-slate-900 ring-2 ring-amber-400'
-                          : 'bg-gray-200 text-gray-400'
+                      ? 'bg-emerald-600 text-white ring-2 ring-emerald-200'
+                      : isCurrent
+                        ? 'bg-amber-200 text-slate-900 ring-2 ring-amber-400'
+                        : 'bg-gray-200 text-gray-400'
                       }`}
                   >
                     <Icon className="w-6 h-6" />
@@ -341,11 +342,15 @@ function Intake() {
                       <FormItem>
                         <FormLabel>{renderFieldLabel('Refugee Narrative (Speech-to-Text)')}</FormLabel>
                         <FormControl>
-                          <AudioRecorder 
+                          <AudioRecorder
                             preferredLanguage={form.watch('preferredLanguage') || 'English'}
                             initialValue={field.value}
+                            initialTranslation={form.watch('translatedNarrative')}
                             onTranscriptionUpdate={(text) => {
                               field.onChange(text);
+                            }}
+                            onTranslationUpdate={(text) => {
+                              form.setValue('translatedNarrative', text);
                             }}
                           />
                         </FormControl>
