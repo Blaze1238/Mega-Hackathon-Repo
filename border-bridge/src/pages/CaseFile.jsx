@@ -14,6 +14,7 @@ import {
   Sparkles,
   Clock
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 const mockCaseData = {
   id: "CS-2024-8932A",
@@ -97,12 +98,6 @@ export default function CaseFile() {
                 Intake: {new Date(data.dateAssigned).toLocaleDateString()}
               </span>
             </div>
-          </div>
-          
-          {/* QR Code Placeholder */}
-          <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 min-w-[140px] shrink-0">
-            <QrCode className="w-16 h-16 text-gray-400 mb-2" />
-            <span className="text-xs text-gray-500 font-medium text-center leading-snug">Scan for<br/>Quick Access</span>
           </div>
         </div>
 
